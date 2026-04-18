@@ -1,4 +1,4 @@
-defmodule Tokenio do
+defmodule TokenioClient do
   @moduledoc """
   Production-grade Elixir client for the Token.io Open Banking platform.
 
@@ -6,31 +6,31 @@ defmodule Tokenio do
 
   | Module | API |
   |---|---|
-  | `Tokenio.Payments` | Payments v2 (PIS) — single & future-dated |
-  | `Tokenio.VRP` | Variable Recurring Payments |
-  | `Tokenio.AIS` | Account Information Services |
-  | `Tokenio.Banks` | Bank discovery (v1 + v2) |
-  | `Tokenio.Refunds` | Payment refunds |
-  | `Tokenio.Payouts` | Settlement payouts |
-  | `Tokenio.Settlement` | Virtual accounts, rules, transactions |
-  | `Tokenio.Transfers` | Transfers (Payments v1) |
-  | `Tokenio.Tokens` | Tokens management |
-  | `Tokenio.TokenRequests` | Token Request legacy flow |
-  | `Tokenio.AccountOnFile` | Tokenized account storage |
-  | `Tokenio.SubTPPs` | Sub-TPP management |
-  | `Tokenio.AuthKeys` | Signing key management |
-  | `Tokenio.Reports` | Bank status reports |
-  | `Tokenio.Webhooks` | Webhook config + HMAC event parsing |
-  | `Tokenio.Verification` | Account ownership verification |
+  | `TokenioClient.Payments` | Payments v2 (PIS) — single & future-dated |
+  | `TokenioClient.VRP` | Variable Recurring Payments |
+  | `TokenioClient.AIS` | Account Information Services |
+  | `TokenioClient.Banks` | Bank discovery (v1 + v2) |
+  | `TokenioClient.Refunds` | Payment refunds |
+  | `TokenioClient.Payouts` | Settlement payouts |
+  | `TokenioClient.Settlement` | Virtual accounts, rules, transactions |
+  | `TokenioClient.Transfers` | Transfers (Payments v1) |
+  | `TokenioClient.Tokens` | Tokens management |
+  | `TokenioClient.TokenRequests` | Token Request legacy flow |
+  | `TokenioClient.AccountOnFile` | Tokenized account storage |
+  | `TokenioClient.SubTPPs` | Sub-TPP management |
+  | `TokenioClient.AuthKeys` | Signing key management |
+  | `TokenioClient.Reports` | Bank status reports |
+  | `TokenioClient.Webhooks` | Webhook config + HMAC event parsing |
+  | `TokenioClient.Verification` | Account ownership verification |
 
   ## Quick start
 
-      {:ok, client} = Tokenio.new(
+      {:ok, client} = TokenioClient.new(
         client_id: System.fetch_env!("TOKENIO_CLIENT_ID"),
         client_secret: System.fetch_env!("TOKENIO_CLIENT_SECRET")
       )
 
-      {:ok, payment} = Tokenio.Payments.initiate(client, %{
+      {:ok, payment} = TokenioClient.Payments.initiate(client, %{
         bank_id: "ob-modelo",
         amount: %{value: "10.50", currency: "GBP"},
         creditor: %{account_number: "12345678", sort_code: "040004", name: "Acme Ltd"},
@@ -39,7 +39,7 @@ defmodule Tokenio do
         return_refund_account: true
       })
 
-      if Tokenio.Payments.Payment.requires_redirect?(payment) do
+      if TokenioClient.Payments.Payment.requires_redirect?(payment) do
         {:redirect, payment.redirect_url}
       end
 
@@ -59,18 +59,18 @@ defmodule Tokenio do
 
   ## Error handling
 
-      case Tokenio.Payments.get(client, payment_id) do
+      case TokenioClient.Payments.get(client, payment_id) do
         {:ok, payment} ->
           payment
 
-        {:error, %Tokenio.Error{code: :not_found}} ->
+        {:error, %TokenioClient.Error{code: :not_found}} ->
           nil
 
-        {:error, %Tokenio.Error{code: :rate_limit_exceeded, retry_after: ra}} ->
+        {:error, %TokenioClient.Error{code: :rate_limit_exceeded, retry_after: ra}} ->
           Process.sleep((ra || 5) * 1_000)
-          Tokenio.Payments.get(client, payment_id)
+          TokenioClient.Payments.get(client, payment_id)
 
-        {:error, %Tokenio.Error{} = err} ->
+        {:error, %TokenioClient.Error{} = err} ->
           raise err
       end
 
@@ -78,36 +78,36 @@ defmodule Tokenio do
 
   Every HTTP request emits:
 
-      [:tokenio, :request, :start]     — %{system_time: integer}
-      [:tokenio, :request, :stop]      — %{duration: milliseconds}
-      [:tokenio, :request, :exception] — %{duration: milliseconds}
+      [:tokenio_client, :request, :start]     — %{system_time: integer}
+      [:tokenio_client, :request, :stop]      — %{duration: milliseconds}
+      [:tokenio_client, :request, :exception] — %{duration: milliseconds}
 
   Metadata on all events: `%{method: atom, path: string}` plus `:status` on `:stop`.
   """
 
-  alias Tokenio.Client
-  alias Tokenio.Error
+  alias TokenioClient.Client
+  alias TokenioClient.Error
 
   @doc """
   Create a new Token.io client.
 
-  Returns `{:ok, client}` on success or `{:error, %Tokenio.Error{}}` on
+  Returns `{:ok, client}` on success or `{:error, %TokenioClient.Error{}}` on
   invalid configuration.
 
   ## Examples
 
       # OAuth2 (recommended for production)
-      {:ok, client} = Tokenio.new(
+      {:ok, client} = TokenioClient.new(
         client_id: "my-client-id",
         client_secret: "my-client-secret",
         environment: :production
       )
 
       # Static token (useful in tests)
-      {:ok, client} = Tokenio.new(static_token: "Bearer xyz")
+      {:ok, client} = TokenioClient.new(static_token: "Bearer xyz")
 
       # Custom base URL (Bypass mock in tests)
-      {:ok, client} = Tokenio.new(static_token: "test", base_url: "http://localhost:4000")
+      {:ok, client} = TokenioClient.new(static_token: "test", base_url: "http://localhost:4000")
   """
   @spec new(keyword()) :: {:ok, Client.t()} | {:error, Error.t()}
   def new(opts) do
@@ -118,7 +118,7 @@ defmodule Tokenio do
   end
 
   @doc """
-  Create a new client, raising `Tokenio.Error` on invalid configuration.
+  Create a new client, raising `TokenioClient.Error` on invalid configuration.
 
   See `new/1` for available options.
   """
@@ -156,7 +156,7 @@ defmodule Tokenio do
     else
       {:error,
        Error.validation(
-         "Tokenio.new/1 requires either :static_token or both :client_id and :client_secret"
+         "TokenioClient.new/1 requires either :static_token or both :client_id and :client_secret"
        )}
     end
   end

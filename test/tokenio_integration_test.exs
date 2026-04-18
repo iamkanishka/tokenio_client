@@ -1,9 +1,9 @@
-defmodule Tokenio.IntegrationTest do
+defmodule TokenioClient.IntegrationTest do
   use ExUnit.Case, async: true
 
   setup do
     bypass = Bypass.open()
-    {:ok, client} = Tokenio.new(static_token: "test-token", base_url: endpoint(bypass))
+    {:ok, client} = TokenioClient.new(static_token: "test-token", base_url: endpoint(bypass))
     {:ok, bypass: bypass, client: client}
   end
 
@@ -19,7 +19,7 @@ defmodule Tokenio.IntegrationTest do
   # Payments
   # ---------------------------------------------------------------------------
 
-  describe "Tokenio.Payments.initiate/2" do
+  describe "TokenioClient.Payments.initiate/2" do
     test "sends correct request and parses payment", %{bypass: bypass, client: client} do
       Bypass.expect_once(bypass, "POST", "/v2/payments", fn conn ->
         {:ok, body, conn} = Plug.Conn.read_body(conn)
@@ -40,7 +40,7 @@ defmodule Tokenio.IntegrationTest do
       end)
 
       assert {:ok, payment} =
-               Tokenio.Payments.initiate(client, %{
+               TokenioClient.Payments.initiate(client, %{
                  bank_id: "ob-modelo",
                  amount: %{value: "10.00", currency: "GBP"},
                  creditor: %{account_number: "12345678", sort_code: "040004", name: "Acme"},
@@ -50,8 +50,8 @@ defmodule Tokenio.IntegrationTest do
       assert payment.id == "pm:abc:def"
       assert payment.status == "INITIATION_PENDING_REDIRECT_AUTH"
       assert payment.redirect_url == "https://bank.example.com/auth"
-      assert Tokenio.Payments.Payment.requires_redirect?(payment)
-      refute Tokenio.Payments.Payment.final?(payment)
+      assert TokenioClient.Payments.Payment.requires_redirect?(payment)
+      refute TokenioClient.Payments.Payment.final?(payment)
     end
 
     test "returns validation_error on 400", %{bypass: bypass, client: client} do
@@ -59,12 +59,12 @@ defmodule Tokenio.IntegrationTest do
         json_resp(conn, 400, %{"code" => "VALIDATION_ERROR", "message" => "bankId required"})
       end)
 
-      assert {:error, %Tokenio.Error{code: :validation_error, status: 400}} =
-               Tokenio.Payments.initiate(client, %{})
+      assert {:error, %TokenioClient.Error{code: :validation_error, status: 400}} =
+               TokenioClient.Payments.initiate(client, %{})
     end
   end
 
-  describe "Tokenio.Payments.get/2" do
+  describe "TokenioClient.Payments.get/2" do
     test "retrieves payment by ID", %{bypass: bypass, client: client} do
       Bypass.expect_once(bypass, "GET", "/v2/payments/pm:abc", fn conn ->
         json_resp(conn, 200, %{
@@ -77,9 +77,9 @@ defmodule Tokenio.IntegrationTest do
         })
       end)
 
-      assert {:ok, payment} = Tokenio.Payments.get(client, "pm:abc")
+      assert {:ok, payment} = TokenioClient.Payments.get(client, "pm:abc")
       assert payment.id == "pm:abc"
-      assert Tokenio.Payments.Payment.completed?(payment)
+      assert TokenioClient.Payments.Payment.completed?(payment)
     end
 
     test "returns not_found for 404", %{bypass: bypass, client: client} do
@@ -87,18 +87,18 @@ defmodule Tokenio.IntegrationTest do
         json_resp(conn, 404, %{"code" => "NOT_FOUND", "message" => "Payment not found"})
       end)
 
-      assert {:error, %Tokenio.Error{code: :not_found} = err} =
-               Tokenio.Payments.get(client, "pm:missing")
+      assert {:error, %TokenioClient.Error{code: :not_found} = err} =
+               TokenioClient.Payments.get(client, "pm:missing")
 
-      assert Tokenio.Error.not_found?(err)
+      assert TokenioClient.Error.not_found?(err)
     end
 
     test "returns validation error for empty payment_id", %{client: client} do
-      assert {:error, %Tokenio.Error{code: :unknown}} = Tokenio.Payments.get(client, "")
+      assert {:error, %TokenioClient.Error{code: :unknown}} = TokenioClient.Payments.get(client, "")
     end
   end
 
-  describe "Tokenio.Payments.list/2" do
+  describe "TokenioClient.Payments.list/2" do
     test "sends correct query params", %{bypass: bypass, client: client} do
       Bypass.expect_once(bypass, "GET", "/v2/payments", fn conn ->
         params = URI.decode_query(conn.query_string)
@@ -111,18 +111,18 @@ defmodule Tokenio.IntegrationTest do
         })
       end)
 
-      assert {:ok, result} = Tokenio.Payments.list(client, limit: 20, offset: "cursor123")
+      assert {:ok, result} = TokenioClient.Payments.list(client, limit: 20, offset: "cursor123")
       assert result.payments == []
       assert result.page_info.limit == 20
     end
 
     test "returns error for invalid limit", %{client: client} do
-      assert {:error, %Tokenio.Error{}} = Tokenio.Payments.list(client, limit: 0)
-      assert {:error, %Tokenio.Error{}} = Tokenio.Payments.list(client, limit: 201)
+      assert {:error, %TokenioClient.Error{}} = TokenioClient.Payments.list(client, limit: 0)
+      assert {:error, %TokenioClient.Error{}} = TokenioClient.Payments.list(client, limit: 201)
     end
   end
 
-  describe "Tokenio.VRP.create_consent/2" do
+  describe "TokenioClient.VRP.create_consent/2" do
     test "creates VRP consent with redirect", %{bypass: bypass, client: client} do
       Bypass.expect_once(bypass, "POST", "/vrp-consents", fn conn ->
         {:ok, body, conn} = Plug.Conn.read_body(conn)
@@ -141,7 +141,7 @@ defmodule Tokenio.IntegrationTest do
       end)
 
       assert {:ok, consent} =
-               Tokenio.VRP.create_consent(client, %{
+               TokenioClient.VRP.create_consent(client, %{
                  bank_id: "ob-modelo",
                  currency: "GBP",
                  creditor: %{account_number: "12345678", sort_code: "040004", name: "Acme"},
@@ -153,7 +153,7 @@ defmodule Tokenio.IntegrationTest do
     end
   end
 
-  describe "Tokenio.VRP.confirm_funds/3" do
+  describe "TokenioClient.VRP.confirm_funds/3" do
     test "returns funds availability", %{bypass: bypass, client: client} do
       Bypass.expect_once(bypass, "GET", "/vrps/vc:abc/confirm-funds", fn conn ->
         params = URI.decode_query(conn.query_string)
@@ -161,11 +161,11 @@ defmodule Tokenio.IntegrationTest do
         json_resp(conn, 200, %{"fundsAvailable" => true})
       end)
 
-      assert {:ok, true} = Tokenio.VRP.confirm_funds(client, "vc:abc", "49.99")
+      assert {:ok, true} = TokenioClient.VRP.confirm_funds(client, "vc:abc", "49.99")
     end
   end
 
-  describe "Tokenio.Banks.list_v2/2" do
+  describe "TokenioClient.Banks.list_v2/2" do
     test "lists banks and parses response", %{bypass: bypass, client: client} do
       Bypass.expect_once(bypass, "GET", "/v2/banks", fn conn ->
         json_resp(conn, 200, %{
@@ -181,7 +181,7 @@ defmodule Tokenio.IntegrationTest do
         })
       end)
 
-      assert {:ok, result} = Tokenio.Banks.list_v2(client, limit: 50)
+      assert {:ok, result} = TokenioClient.Banks.list_v2(client, limit: 50)
       assert result.banks != []
       bank = hd(result.banks)
       assert bank.id == "ob-modelo"
@@ -189,7 +189,7 @@ defmodule Tokenio.IntegrationTest do
     end
   end
 
-  describe "Tokenio.Webhooks config" do
+  describe "TokenioClient.Webhooks config" do
     test "set_config sends PUT with URL", %{bypass: bypass, client: client} do
       Bypass.expect_once(bypass, "PUT", "/webhook-config", fn conn ->
         {:ok, body, conn} = Plug.Conn.read_body(conn)
@@ -198,7 +198,7 @@ defmodule Tokenio.IntegrationTest do
         json_resp(conn, 200, %{})
       end)
 
-      assert :ok = Tokenio.Webhooks.set_config(client, "https://yourapp.com/hooks")
+      assert :ok = TokenioClient.Webhooks.set_config(client, "https://yourapp.com/hooks")
     end
 
     test "get_config returns config map", %{bypass: bypass, client: client} do
@@ -208,7 +208,7 @@ defmodule Tokenio.IntegrationTest do
         })
       end)
 
-      assert {:ok, config} = Tokenio.Webhooks.get_config(client)
+      assert {:ok, config} = TokenioClient.Webhooks.get_config(client)
       assert config["url"] == "https://yourapp.com/hooks"
     end
   end
@@ -224,7 +224,7 @@ defmodule Tokenio.IntegrationTest do
         })
       end)
 
-      assert {:ok, result} = Tokenio.AIS.list_accounts(client, limit: 10)
+      assert {:ok, result} = TokenioClient.AIS.list_accounts(client, limit: 10)
       assert result.accounts != []
       assert hd(result.accounts).id == "acc:1"
     end
@@ -239,7 +239,7 @@ defmodule Tokenio.IntegrationTest do
         })
       end)
 
-      assert {:ok, balance} = Tokenio.AIS.get_balance(client, "acc:1")
+      assert {:ok, balance} = TokenioClient.AIS.get_balance(client, "acc:1")
       assert balance.account_id == "acc:1"
       assert balance.current.value == "1234.56"
     end
@@ -248,7 +248,7 @@ defmodule Tokenio.IntegrationTest do
   describe "retry behaviour" do
     test "retries on 503 then succeeds", %{bypass: bypass} do
       {:ok, fast_client} =
-        Tokenio.new(
+        TokenioClient.new(
           static_token: "tok",
           base_url: endpoint(bypass),
           max_retries: 2,
@@ -275,14 +275,14 @@ defmodule Tokenio.IntegrationTest do
         end
       end)
 
-      assert {:ok, payment} = Tokenio.Payments.get(fast_client, "pm:retry")
+      assert {:ok, payment} = TokenioClient.Payments.get(fast_client, "pm:retry")
       assert payment.id == "pm:retry"
       assert :counters.get(count, 1) == 3
     end
 
     test "does not retry on 400", %{bypass: bypass} do
       {:ok, retry_client} =
-        Tokenio.new(
+        TokenioClient.new(
           static_token: "tok",
           base_url: endpoint(bypass),
           max_retries: 3
@@ -295,8 +295,8 @@ defmodule Tokenio.IntegrationTest do
         json_resp(conn, 400, %{"code" => "VALIDATION_ERROR", "message" => "bad"})
       end)
 
-      assert {:error, %Tokenio.Error{code: :validation_error}} =
-               Tokenio.Payments.get(retry_client, "pm:bad")
+      assert {:error, %TokenioClient.Error{code: :validation_error}} =
+               TokenioClient.Payments.get(retry_client, "pm:bad")
 
       assert :counters.get(count, 1) == 1
     end
@@ -312,7 +312,7 @@ defmodule Tokenio.IntegrationTest do
         })
       end)
 
-      assert {:ok, statuses} = Tokenio.Reports.list_bank_statuses(client)
+      assert {:ok, statuses} = TokenioClient.Reports.list_bank_statuses(client)
       assert statuses != []
       assert hd(statuses).bank_id == "ob-modelo"
       assert hd(statuses).pis_available == true
@@ -337,7 +337,7 @@ defmodule Tokenio.IntegrationTest do
       end)
 
       assert {:ok, check} =
-               Tokenio.Verification.initiate(client, %{
+               TokenioClient.Verification.initiate(client, %{
                  bank_id: "ob-modelo",
                  account: %{account_number: "12345678", sort_code: "040004", name: "Test"}
                })

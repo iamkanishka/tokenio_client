@@ -1,4 +1,4 @@
-defmodule Tokenio.Types do
+defmodule TokenioClient.Types do
   @moduledoc "Shared domain types used across all Token.io API modules."
 
   # ---------------------------------------------------------------------------

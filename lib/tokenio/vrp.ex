@@ -1,4 +1,4 @@
-defmodule Tokenio.VRP do
+defmodule TokenioClient.VRP do
   @moduledoc """
   Token.io Variable Recurring Payments (VRP) API.
 
@@ -12,7 +12,7 @@ defmodule Tokenio.VRP do
   ## Example
 
       # 1. Create consent
-      {:ok, consent} = Tokenio.VRP.create_consent(client, %{
+      {:ok, consent} = TokenioClient.VRP.create_consent(client, %{
         bank_id: "ob-modelo",
         currency: "GBP",
         creditor: %{account_number: "12345678", sort_code: "040004", name: "Acme"},
@@ -24,24 +24,24 @@ defmodule Tokenio.VRP do
       })
 
       # 2. Redirect PSU to authorize
-      if Tokenio.VRP.Consent.requires_redirect?(consent) do
+      if TokenioClient.VRP.Consent.requires_redirect?(consent) do
         redirect_to(consent.redirect_url)
       end
 
       # 3. Initiate a payment against the authorized consent
-      {:ok, payment} = Tokenio.VRP.create_payment(client, %{
+      {:ok, payment} = TokenioClient.VRP.create_payment(client, %{
         consent_id: consent.id,
         amount: %{value: "49.99", currency: "GBP"},
         remittance_information_primary: "Monthly subscription"
       })
   """
 
-  alias Tokenio.Client
-  alias Tokenio.Error
-  alias Tokenio.HTTP.Client, as: HTTP
-  alias Tokenio.Types
-  alias Tokenio.VRP.Consent
-  alias Tokenio.VRP.Payment
+  alias TokenioClient.Client
+  alias TokenioClient.Error
+  alias TokenioClient.HTTP.Client, as: HTTP
+  alias TokenioClient.Types
+  alias TokenioClient.VRP.Consent
+  alias TokenioClient.VRP.Payment
 
   # ---------------------------------------------------------------------------
   # Consent operations

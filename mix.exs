@@ -1,4 +1,4 @@
-defmodule Tokenio.MixProject do
+defmodule TokenioClient.MixProject do
   @moduledoc false
   use Mix.Project
 
@@ -9,7 +9,7 @@ defmodule Tokenio.MixProject do
     [
       app: :tokenio_client,
       version: @version,
-      elixir: "~> 1.15",
+      elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       description: description(),
@@ -25,7 +25,7 @@ defmodule Tokenio.MixProject do
   def application do
     [
       extra_applications: [:logger, :crypto],
-      mod: {Tokenio.Application, []}
+      mod: {TokenioClient.Application, []}
     ]
   end
 
@@ -64,7 +64,7 @@ defmodule Tokenio.MixProject do
   defp docs do
     [
       main: "readme",
-      name: "Tokenio",
+      name: "TokenioClient",
       source_ref: "v#{@version}",
       source_url: @source_url,
       extras: ["README.md", "CHANGELOG.md"]

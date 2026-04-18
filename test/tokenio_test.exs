@@ -1,42 +1,42 @@
-defmodule TokenioTest do
+defmodule TokenioClientTest do
   use ExUnit.Case, async: true
 
   describe "new/1" do
     test "accepts oauth2 credentials" do
-      assert {:ok, client} = Tokenio.new(client_id: "id", client_secret: "secret")
+      assert {:ok, client} = TokenioClient.new(client_id: "id", client_secret: "secret")
       assert client.http.auth == {:oauth2, "id", "secret"}
     end
 
     test "accepts static token" do
-      assert {:ok, client} = Tokenio.new(static_token: "tok")
+      assert {:ok, client} = TokenioClient.new(static_token: "tok")
       assert client.http.auth == {:static, "tok"}
     end
 
     test "defaults to sandbox environment" do
-      assert {:ok, client} = Tokenio.new(static_token: "tok")
+      assert {:ok, client} = TokenioClient.new(static_token: "tok")
       assert client.http.base_url == "https://api.sandbox.token.io"
     end
 
     test "production environment" do
-      assert {:ok, client} = Tokenio.new(static_token: "tok", environment: :production)
+      assert {:ok, client} = TokenioClient.new(static_token: "tok", environment: :production)
       assert client.http.base_url == "https://api.token.io"
     end
 
     test "custom base_url overrides environment" do
-      assert {:ok, client} = Tokenio.new(static_token: "tok", base_url: "http://localhost:4000")
+      assert {:ok, client} = TokenioClient.new(static_token: "tok", base_url: "http://localhost:4000")
       assert client.http.base_url == "http://localhost:4000"
     end
 
     test "returns error when no credentials given" do
-      assert {:error, %Tokenio.Error{code: :unknown}} = Tokenio.new([])
+      assert {:error, %TokenioClient.Error{code: :unknown}} = TokenioClient.new([])
     end
 
     test "returns error for empty static_token" do
-      assert {:error, %Tokenio.Error{code: :unknown}} = Tokenio.new(static_token: "")
+      assert {:error, %TokenioClient.Error{code: :unknown}} = TokenioClient.new(static_token: "")
     end
 
     test "applies custom timeout and max_retries" do
-      assert {:ok, client} = Tokenio.new(static_token: "tok", timeout: 60_000, max_retries: 5)
+      assert {:ok, client} = TokenioClient.new(static_token: "tok", timeout: 60_000, max_retries: 5)
       assert client.http.timeout == 60_000
       assert client.http.max_retries == 5
     end
@@ -44,28 +44,28 @@ defmodule TokenioTest do
 
   describe "new!/1" do
     test "returns client on success" do
-      assert %Tokenio.Client{} = Tokenio.new!(static_token: "tok")
+      assert %TokenioClient.Client{} = TokenioClient.new!(static_token: "tok")
     end
 
-    test "raises Tokenio.Error on missing credentials" do
-      assert_raise Tokenio.Error, fn -> Tokenio.new!([]) end
+    test "raises TokenioClient.Error on missing credentials" do
+      assert_raise TokenioClient.Error, fn -> TokenioClient.new!([]) end
     end
   end
 
   describe "version/0" do
     test "returns a non-empty string" do
-      assert is_binary(Tokenio.version())
-      assert Tokenio.version() != ""
+      assert is_binary(TokenioClient.version())
+      assert TokenioClient.version() != ""
     end
   end
 end
 
 # =============================================================================
 
-defmodule Tokenio.ErrorTest do
+defmodule TokenioClient.ErrorTest do
   use ExUnit.Case, async: true
 
-  alias Tokenio.Error
+  alias TokenioClient.Error
 
   describe "from_response/4" do
     test "maps 404 to :not_found" do
@@ -170,10 +170,10 @@ end
 
 # =============================================================================
 
-defmodule Tokenio.Payments.PaymentTest do
+defmodule TokenioClient.Payments.PaymentTest do
   use ExUnit.Case, async: true
 
-  alias Tokenio.Payments.Payment
+  alias TokenioClient.Payments.Payment
 
   @raw_completed %{
     "id" => "pm:abc:def",
@@ -291,10 +291,10 @@ end
 
 # =============================================================================
 
-defmodule Tokenio.VRP.ConsentTest do
+defmodule TokenioClient.VRP.ConsentTest do
   use ExUnit.Case, async: true
 
-  alias Tokenio.VRP.Consent
+  alias TokenioClient.VRP.Consent
 
   describe "from_map/1" do
     test "parses consent" do
@@ -345,10 +345,10 @@ end
 
 # =============================================================================
 
-defmodule Tokenio.TypesTest do
+defmodule TokenioClient.TypesTest do
   use ExUnit.Case, async: true
 
-  alias Tokenio.Types
+  alias TokenioClient.Types
 
   describe "Amount.from_map/1" do
     test "parses correctly" do
@@ -436,13 +436,13 @@ end
 
 # =============================================================================
 
-defmodule Tokenio.WebhooksTest do
+defmodule TokenioClient.WebhooksTest do
   use ExUnit.Case, async: true
 
-  alias Tokenio.Webhooks
+  alias TokenioClient.Webhooks
 
   # Non-production test secret — safe to commit per gosec equivalent in Elixir.
-  @test_secret "tokenio-test-webhook-secret-for-unit-tests-only"
+  @test_secret "tokenio_client-test-webhook-secret-for-unit-tests-only"
 
   defp make_sig(secret, payload) do
     ts = System.os_time(:second)
@@ -568,10 +568,10 @@ end
 
 # =============================================================================
 
-defmodule Tokenio.HTTP.TokenCacheTest do
+defmodule TokenioClient.HTTP.TokenCacheTest do
   use ExUnit.Case, async: false
 
-  alias Tokenio.HTTP.TokenCache
+  alias TokenioClient.HTTP.TokenCache
 
   setup do
     # Start a fresh TokenCache for each test to avoid cross-test contamination
@@ -614,9 +614,9 @@ defmodule Tokenio.HTTP.TokenCacheTest do
 
     result =
       TokenCache.get_or_fetch(key, fn ->
-        {:error, %Tokenio.Error{code: :unauthorized, message: "Bad creds", status: 401}}
+        {:error, %TokenioClient.Error{code: :unauthorized, message: "Bad creds", status: 401}}
       end)
 
-    assert {:error, %Tokenio.Error{code: :unauthorized}} = result
+    assert {:error, %TokenioClient.Error{code: :unauthorized}} = result
   end
 end

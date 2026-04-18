@@ -1,4 +1,4 @@
-defmodule Tokenio.Application do
+defmodule TokenioClient.Application do
   @moduledoc false
 
   use Application
@@ -7,20 +7,20 @@ defmodule Tokenio.Application do
   @impl Application
   def start(_type, _args) do
     children = [
-      Tokenio.HTTP.TokenCache,
-      {Finch, name: Tokenio.Finch, pools: finch_pools()}
+      TokenioClient.HTTP.TokenCache,
+      {Finch, name: TokenioClient.Finch, pools: finch_pools()}
     ]
 
-    opts = [strategy: :one_for_one, name: Tokenio.Supervisor]
+    opts = [strategy: :one_for_one, name: TokenioClient.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
   @spec finch_pools() :: map()
   defp finch_pools do
-    sandbox = Application.get_env(:tokenio, :sandbox_base_url, "https://api.sandbox.token.io")
-    prod = Application.get_env(:tokenio, :production_base_url, "https://api.token.io")
-    size = Application.get_env(:tokenio, :pool_size, 10)
-    count = Application.get_env(:tokenio, :pool_count, 1)
+    sandbox = Application.get_env(:tokenio_client, :sandbox_base_url, "https://api.sandbox.token.io")
+    prod = Application.get_env(:tokenio_client, :production_base_url, "https://api.token.io")
+    size = Application.get_env(:tokenio_client, :pool_size, 10)
+    count = Application.get_env(:tokenio_client, :pool_count, 1)
 
     pool_config = [size: size, count: count]
 

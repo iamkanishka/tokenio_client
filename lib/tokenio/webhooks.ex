@@ -1,4 +1,4 @@
-defmodule Tokenio.Webhooks do
+defmodule TokenioClient.Webhooks do
   @moduledoc """
   Token.io Webhooks API.
 
@@ -22,7 +22,7 @@ defmodule Tokenio.Webhooks do
         sig = conn |> Plug.Conn.get_req_header("x-token-signature") |> List.first()
         secret = System.fetch_env!("TOKENIO_WEBHOOK_SECRET")
 
-        case Tokenio.Webhooks.parse(body, sig, webhook_secret: secret) do
+        case TokenioClient.Webhooks.parse(body, sig, webhook_secret: secret) do
           {:ok, %{type: "payment.completed"} = event} ->
             handle_payment(event)
             send_resp(conn, 200, "ok")
@@ -33,9 +33,9 @@ defmodule Tokenio.Webhooks do
       end
   """
 
-  alias Tokenio.Client
-  alias Tokenio.Error
-  alias Tokenio.HTTP.Client, as: HTTP
+  alias TokenioClient.Client
+  alias TokenioClient.Error
+  alias TokenioClient.HTTP.Client, as: HTTP
 
   @stale_threshold_s 300
 

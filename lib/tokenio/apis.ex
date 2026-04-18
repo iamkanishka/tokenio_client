@@ -1,4 +1,4 @@
-defmodule Tokenio.AIS do
+defmodule TokenioClient.AIS do
   @moduledoc """
   Token.io Account Information Services (AIS) API.
 
@@ -6,10 +6,10 @@ defmodule Tokenio.AIS do
   consent: accounts, balances, standing orders, and transactions.
   """
 
-  alias Tokenio.Client
-  alias Tokenio.Error
-  alias Tokenio.HTTP.Client, as: HTTP
-  alias Tokenio.Types
+  alias TokenioClient.Client
+  alias TokenioClient.Error
+  alias TokenioClient.HTTP.Client, as: HTTP
+  alias TokenioClient.Types
 
   defmodule Account do
     @moduledoc "A bank account returned from the AIS API."
@@ -291,13 +291,13 @@ end
 
 # =============================================================================
 
-defmodule Tokenio.Banks do
+defmodule TokenioClient.Banks do
   @moduledoc "Token.io Banks v1 and v2 APIs for listing supported financial institutions."
 
-  alias Tokenio.Client
-  alias Tokenio.Error
-  alias Tokenio.HTTP.Client, as: HTTP
-  alias Tokenio.Types
+  alias TokenioClient.Client
+  alias TokenioClient.Error
+  alias TokenioClient.HTTP.Client, as: HTTP
+  alias TokenioClient.Types
 
   defmodule Bank do
     @moduledoc "A financial institution supported by Token.io."
@@ -407,13 +407,13 @@ end
 
 # =============================================================================
 
-defmodule Tokenio.Refunds do
+defmodule TokenioClient.Refunds do
   @moduledoc "Token.io Refunds API — initiate and track payment refunds."
 
-  alias Tokenio.Client
-  alias Tokenio.Error
-  alias Tokenio.HTTP.Client, as: HTTP
-  alias Tokenio.Types
+  alias TokenioClient.Client
+  alias TokenioClient.Error
+  alias TokenioClient.HTTP.Client, as: HTTP
+  alias TokenioClient.Types
 
   defmodule Refund do
     @moduledoc "A refund resource."
@@ -515,13 +515,13 @@ end
 
 # =============================================================================
 
-defmodule Tokenio.Payouts do
+defmodule TokenioClient.Payouts do
   @moduledoc "Token.io Payouts API — send money from settlement accounts."
 
-  alias Tokenio.Client
-  alias Tokenio.Error
-  alias Tokenio.HTTP.Client, as: HTTP
-  alias Tokenio.Types
+  alias TokenioClient.Client
+  alias TokenioClient.Error
+  alias TokenioClient.HTTP.Client, as: HTTP
+  alias TokenioClient.Types
 
   defmodule Payout do
     @moduledoc "A payout resource."
@@ -610,13 +610,13 @@ end
 
 # =============================================================================
 
-defmodule Tokenio.Settlement do
+defmodule TokenioClient.Settlement do
   @moduledoc "Token.io Settlement Accounts API — virtual accounts, rules, and transactions."
 
-  alias Tokenio.Client
-  alias Tokenio.Error
-  alias Tokenio.HTTP.Client, as: HTTP
-  alias Tokenio.Types
+  alias TokenioClient.Client
+  alias TokenioClient.Error
+  alias TokenioClient.HTTP.Client, as: HTTP
+  alias TokenioClient.Types
 
   defmodule Account do
     @moduledoc "A virtual settlement account."
@@ -858,13 +858,13 @@ end
 
 # =============================================================================
 
-defmodule Tokenio.Transfers do
+defmodule TokenioClient.Transfers do
   @moduledoc "Token.io Transfers API — Payments v1 token redemption."
 
-  alias Tokenio.Client
-  alias Tokenio.Error
-  alias Tokenio.HTTP.Client, as: HTTP
-  alias Tokenio.Types
+  alias TokenioClient.Client
+  alias TokenioClient.Error
+  alias TokenioClient.HTTP.Client, as: HTTP
+  alias TokenioClient.Types
 
   defmodule Transfer do
     @moduledoc "A transfer resource (Payments v1)."
@@ -951,13 +951,13 @@ end
 
 # =============================================================================
 
-defmodule Tokenio.Tokens do
+defmodule TokenioClient.Tokens do
   @moduledoc "Token.io Tokens API — list, retrieve, and cancel authorisation tokens."
 
-  alias Tokenio.Client
-  alias Tokenio.Error
-  alias Tokenio.HTTP.Client, as: HTTP
-  alias Tokenio.Types
+  alias TokenioClient.Client
+  alias TokenioClient.Error
+  alias TokenioClient.HTTP.Client, as: HTTP
+  alias TokenioClient.Types
 
   defmodule Token do
     @moduledoc "An authorisation token."
@@ -1026,12 +1026,12 @@ end
 
 # =============================================================================
 
-defmodule Tokenio.TokenRequests do
+defmodule TokenioClient.TokenRequests do
   @moduledoc "Token.io Token Requests API — Payments v1 / AIS legacy flow."
 
-  alias Tokenio.Client
-  alias Tokenio.Error
-  alias Tokenio.HTTP.Client, as: HTTP
+  alias TokenioClient.Client
+  alias TokenioClient.Error
+  alias TokenioClient.HTTP.Client, as: HTTP
 
   defmodule TokenRequest do
     @moduledoc "A stored token request."
@@ -1102,13 +1102,13 @@ end
 
 # =============================================================================
 
-defmodule Tokenio.AccountOnFile do
+defmodule TokenioClient.AccountOnFile do
   @moduledoc "Token.io Account on File API — tokenized account storage."
 
-  alias Tokenio.Client
-  alias Tokenio.Error
-  alias Tokenio.HTTP.Client, as: HTTP
-  alias Tokenio.Types
+  alias TokenioClient.Client
+  alias TokenioClient.Error
+  alias TokenioClient.HTTP.Client, as: HTTP
+  alias TokenioClient.Types
 
   defmodule TokenizedAccount do
     @moduledoc "A tokenized (stored) bank account reference."
@@ -1177,13 +1177,13 @@ end
 
 # =============================================================================
 
-defmodule Tokenio.SubTPPs do
+defmodule TokenioClient.SubTPPs do
   @moduledoc "Token.io Sub-TPPs API — manage unregulated TPPs under a regulated parent."
 
-  alias Tokenio.Client
-  alias Tokenio.Error
-  alias Tokenio.HTTP.Client, as: HTTP
-  alias Tokenio.Types
+  alias TokenioClient.Client
+  alias TokenioClient.Error
+  alias TokenioClient.HTTP.Client, as: HTTP
+  alias TokenioClient.Types
 
   defmodule SubTPP do
     @moduledoc "A sub-TPP entity."
@@ -1263,13 +1263,13 @@ end
 
 # =============================================================================
 
-defmodule Tokenio.AuthKeys do
+defmodule TokenioClient.AuthKeys do
   @moduledoc "Token.io Authentication Keys API — manage RSA/EC signing keys."
 
-  alias Tokenio.Client
-  alias Tokenio.Error
-  alias Tokenio.HTTP.Client, as: HTTP
-  alias Tokenio.Types
+  alias TokenioClient.Client
+  alias TokenioClient.Error
+  alias TokenioClient.HTTP.Client, as: HTTP
+  alias TokenioClient.Types
 
   defmodule MemberKey do
     @moduledoc "A registered public authentication key."
@@ -1344,12 +1344,12 @@ end
 
 # =============================================================================
 
-defmodule Tokenio.Reports do
+defmodule TokenioClient.Reports do
   @moduledoc "Token.io Reports API — bank operational status."
 
-  alias Tokenio.Client
-  alias Tokenio.Error
-  alias Tokenio.HTTP.Client, as: HTTP
+  alias TokenioClient.Client
+  alias TokenioClient.Error
+  alias TokenioClient.HTTP.Client, as: HTTP
 
   defmodule BankStatus do
     @moduledoc "Operational status for a single bank connection."
@@ -1409,13 +1409,13 @@ end
 
 # =============================================================================
 
-defmodule Tokenio.Verification do
+defmodule TokenioClient.Verification do
   @moduledoc "Token.io Verification API — account ownership verification."
 
-  alias Tokenio.Client
-  alias Tokenio.Error
-  alias Tokenio.HTTP.Client, as: HTTP
-  alias Tokenio.Types
+  alias TokenioClient.Client
+  alias TokenioClient.Error
+  alias TokenioClient.HTTP.Client, as: HTTP
+  alias TokenioClient.Types
 
   defmodule Check do
     @moduledoc "An account verification check result."

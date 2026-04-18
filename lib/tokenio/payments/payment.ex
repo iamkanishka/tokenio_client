@@ -1,19 +1,19 @@
-defmodule Tokenio.Payments.Payment do
+defmodule TokenioClient.Payments.Payment do
   @moduledoc """
   A Token.io payment resource returned by the Payments v2 API.
 
   ## Status predicates
 
-      payment = Tokenio.Payments.Payment.from_map(raw)
+      payment = TokenioClient.Payments.Payment.from_map(raw)
 
-      Tokenio.Payments.Payment.final?(payment)
-      Tokenio.Payments.Payment.requires_redirect?(payment)
-      Tokenio.Payments.Payment.requires_embedded_auth?(payment)
-      Tokenio.Payments.Payment.completed?(payment)
-      Tokenio.Payments.Payment.failed?(payment)
+      TokenioClient.Payments.Payment.final?(payment)
+      TokenioClient.Payments.Payment.requires_redirect?(payment)
+      TokenioClient.Payments.Payment.requires_embedded_auth?(payment)
+      TokenioClient.Payments.Payment.completed?(payment)
+      TokenioClient.Payments.Payment.failed?(payment)
   """
 
-  alias Tokenio.Types
+  alias TokenioClient.Types
 
   @terminal_statuses ~w[
     INITIATION_COMPLETED

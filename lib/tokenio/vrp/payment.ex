@@ -1,16 +1,16 @@
-defmodule Tokenio.VRP.Payment do
+defmodule TokenioClient.VRP.Payment do
   @moduledoc """
   A single VRP payment resource returned by the Token.io VRP API.
 
-  Individual payments are made against an authorised `Tokenio.VRP.Consent`.
+  Individual payments are made against an authorised `TokenioClient.VRP.Consent`.
 
   ## Status predicates
 
-      Tokenio.VRP.Payment.final?(payment)
-      Tokenio.VRP.Payment.completed?(payment)
+      TokenioClient.VRP.Payment.final?(payment)
+      TokenioClient.VRP.Payment.completed?(payment)
   """
 
-  alias Tokenio.Types
+  alias TokenioClient.Types
 
   @terminal ~w[
     INITIATION_COMPLETED

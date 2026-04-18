@@ -1,12 +1,12 @@
-defmodule Tokenio.Client do
+defmodule TokenioClient.Client do
   @moduledoc """
   Root Token.io SDK client struct.
 
-  Obtain one via `Tokenio.new/1` and pass it to any API function.
+  Obtain one via `TokenioClient.new/1` and pass it to any API function.
   The struct itself is an opaque value — do not access its fields directly.
   """
 
-  alias Tokenio.HTTP.Client, as: HTTP
+  alias TokenioClient.HTTP.Client, as: HTTP
 
   @type t :: %__MODULE__{http: HTTP.t()}
 

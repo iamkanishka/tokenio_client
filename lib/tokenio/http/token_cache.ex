@@ -1,19 +1,19 @@
-defmodule Tokenio.HTTP.TokenCache do
+defmodule TokenioClient.HTTP.TokenCache do
   @moduledoc """
   ETS-backed OAuth2 token cache with TTL expiry.
 
   Tokens are cached per `client_id` and automatically refreshed
   60 seconds before expiry to avoid races at TTL boundaries.
-  Supervised automatically by `Tokenio.Application`.
+  Supervised automatically by `TokenioClient.Application`.
   """
 
   use GenServer
 
-  @table :tokenio_token_cache
+  @table :tokenio_client_token_cache
   # Refresh 60 s before the token actually expires
   @refresh_buffer_s 60
 
-  @typep fetch_fn :: (-> {:ok, String.t(), pos_integer()} | {:error, Tokenio.Error.t()})
+  @typep fetch_fn :: (-> {:ok, String.t(), pos_integer()} | {:error, TokenioClient.Error.t()})
 
   # ---------------------------------------------------------------------------
   # Public API
@@ -25,7 +25,7 @@ defmodule Tokenio.HTTP.TokenCache do
   `fetch_fn` must return `{:ok, token, ttl_seconds}` on success.
   """
   @spec get_or_fetch(String.t(), fetch_fn()) ::
-          {:ok, String.t()} | {:error, Tokenio.Error.t()}
+          {:ok, String.t()} | {:error, TokenioClient.Error.t()}
   def get_or_fetch(client_id, fetch_fn) do
     case lookup(client_id) do
       {:ok, token} ->

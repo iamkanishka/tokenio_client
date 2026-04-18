@@ -1,7 +1,7 @@
-# Tokenio
+# TokenioClient
 
-[![Hex.pm](https://img.shields.io/hexpm/v/tokenio.svg)](https://hex.pm/packages/tokenio)
-[![Documentation](https://img.shields.io/badge/docs-hexdocs-purple.svg)](https://hexdocs.pm/tokenio)
+[![Hex.pm](https://img.shields.io/hexpm/v/tokenio_client.svg)](https://hex.pm/packages/tokenio_client)
+[![Documentation](https://img.shields.io/badge/docs-hexdocs-purple.svg)](https://hexdocs.pm/tokenio_client)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 Production-grade Elixir client for the [Token.io Open Banking platform](https://reference.token.io).
@@ -15,7 +15,7 @@ Covers all **16 APIs** from `reference.token.io` with full type safety, automati
 ```elixir
 # mix.exs
 def deps do
-  [{:tokenio, "~> 1.0"}]
+  [{:tokenio_client, "~> 1.0"}]
 end
 ```
 
@@ -25,7 +25,7 @@ end
 
 ```elixir
 # Create a client (OAuth2)
-{:ok, client} = Tokenio.new(
+{:ok, client} = TokenioClient.new(
   client_id: System.fetch_env!("TOKENIO_CLIENT_ID"),
   client_secret: System.fetch_env!("TOKENIO_CLIENT_SECRET")
   # environment: :sandbox  ← default
@@ -33,7 +33,7 @@ end
 )
 
 # Initiate a payment
-{:ok, payment} = Tokenio.Payments.initiate(client, %{
+{:ok, payment} = TokenioClient.Payments.initiate(client, %{
   bank_id: "ob-modelo",
   amount: %{value: "10.50", currency: "GBP"},
   creditor: %{account_number: "12345678", sort_code: "040004", name: "Acme Ltd"},
@@ -43,12 +43,12 @@ end
 })
 
 # Handle the auth flow
-if Tokenio.Payments.Payment.requires_redirect?(payment) do
+if TokenioClient.Payments.Payment.requires_redirect?(payment) do
   redirect_to(payment.redirect_url)
 end
 
 # Poll to final status (prefer webhooks in production)
-{:ok, final} = Tokenio.Payments.poll_until_final(client, payment.id,
+{:ok, final} = TokenioClient.Payments.poll_until_final(client, payment.id,
   interval_ms: 2_000,
   timeout_ms: 60_000
 )
@@ -60,22 +60,22 @@ end
 
 | Module | Endpoints |
 |---|---|
-| `Tokenio.Payments` | `initiate`, `get`, `list`, `get_with_timeout`, `provide_embedded_auth`, `generate_qr_code`, `poll_until_final` |
-| `Tokenio.VRP` | `create_consent`, `get_consent`, `list_consents`, `revoke_consent`, `list_consent_payments`, `create_payment`, `get_payment`, `list_payments`, `confirm_funds` |
-| `Tokenio.AIS` | `list_accounts`, `get_account`, `list_balances`, `get_balance`, `list_transactions`, `get_transaction`, `list_standing_orders`, `get_standing_order` |
-| `Tokenio.Banks` | `list_v1`, `list_v2`, `list_countries` |
-| `Tokenio.Refunds` | `initiate`, `get`, `list` |
-| `Tokenio.Payouts` | `initiate`, `get`, `list` |
-| `Tokenio.Settlement` | `create_account`, `list_accounts`, `get_account`, `list_transactions`, `get_transaction`, `create_rule`, `list_rules`, `delete_rule` |
-| `Tokenio.Transfers` | `redeem`, `get`, `list` |
-| `Tokenio.Tokens` | `list`, `get`, `cancel` |
-| `Tokenio.TokenRequests` | `store`, `get`, `get_result`, `initiate_bank_auth` |
-| `Tokenio.AccountOnFile` | `create`, `get`, `delete` |
-| `Tokenio.SubTPPs` | `create`, `list`, `get`, `delete` |
-| `Tokenio.AuthKeys` | `submit`, `list`, `get`, `delete` |
-| `Tokenio.Reports` | `list_bank_statuses`, `get_bank_status` |
-| `Tokenio.Webhooks` | `set_config`, `get_config`, `delete_config`, `parse`, typed decoders |
-| `Tokenio.Verification` | `initiate` |
+| `TokenioClient.Payments` | `initiate`, `get`, `list`, `get_with_timeout`, `provide_embedded_auth`, `generate_qr_code`, `poll_until_final` |
+| `TokenioClient.VRP` | `create_consent`, `get_consent`, `list_consents`, `revoke_consent`, `list_consent_payments`, `create_payment`, `get_payment`, `list_payments`, `confirm_funds` |
+| `TokenioClient.AIS` | `list_accounts`, `get_account`, `list_balances`, `get_balance`, `list_transactions`, `get_transaction`, `list_standing_orders`, `get_standing_order` |
+| `TokenioClient.Banks` | `list_v1`, `list_v2`, `list_countries` |
+| `TokenioClient.Refunds` | `initiate`, `get`, `list` |
+| `TokenioClient.Payouts` | `initiate`, `get`, `list` |
+| `TokenioClient.Settlement` | `create_account`, `list_accounts`, `get_account`, `list_transactions`, `get_transaction`, `create_rule`, `list_rules`, `delete_rule` |
+| `TokenioClient.Transfers` | `redeem`, `get`, `list` |
+| `TokenioClient.Tokens` | `list`, `get`, `cancel` |
+| `TokenioClient.TokenRequests` | `store`, `get`, `get_result`, `initiate_bank_auth` |
+| `TokenioClient.AccountOnFile` | `create`, `get`, `delete` |
+| `TokenioClient.SubTPPs` | `create`, `list`, `get`, `delete` |
+| `TokenioClient.AuthKeys` | `submit`, `list`, `get`, `delete` |
+| `TokenioClient.Reports` | `list_bank_statuses`, `get_bank_status` |
+| `TokenioClient.Webhooks` | `set_config`, `get_config`, `delete_config`, `parse`, typed decoders |
+| `TokenioClient.Verification` | `initiate` |
 
 ---
 
@@ -83,7 +83,7 @@ end
 
 ```elixir
 # 1. Create consent
-{:ok, consent} = Tokenio.VRP.create_consent(client, %{
+{:ok, consent} = TokenioClient.VRP.create_consent(client, %{
   bank_id: "ob-modelo",
   currency: "GBP",
   creditor: %{account_number: "12345678", sort_code: "040004", name: "Acme"},
@@ -95,15 +95,15 @@ end
 })
 
 # 2. Redirect PSU
-if Tokenio.VRP.Consent.requires_redirect?(consent) do
+if TokenioClient.VRP.Consent.requires_redirect?(consent) do
   redirect_to(consent.redirect_url)
 end
 
 # 3. Check funds (optional)
-{:ok, available} = Tokenio.VRP.confirm_funds(client, consent.id, "49.99")
+{:ok, available} = TokenioClient.VRP.confirm_funds(client, consent.id, "49.99")
 
 # 4. Initiate a payment once AUTHORIZED
-{:ok, payment} = Tokenio.VRP.create_payment(client, %{
+{:ok, payment} = TokenioClient.VRP.create_payment(client, %{
   consent_id: consent.id,
   amount: %{value: "49.99", currency: "GBP"},
   remittance_information_primary: "Subscription Jan 2025"
@@ -115,14 +115,14 @@ end
 ## Account Information Services (AIS)
 
 ```elixir
-{:ok, %{accounts: accounts}} = Tokenio.AIS.list_accounts(client, limit: 50)
+{:ok, %{accounts: accounts}} = TokenioClient.AIS.list_accounts(client, limit: 50)
 
 for account <- accounts do
-  {:ok, balance} = Tokenio.AIS.get_balance(client, account.id)
+  {:ok, balance} = TokenioClient.AIS.get_balance(client, account.id)
   IO.puts("#{account.display_name}: #{balance.current.value} #{balance.current.currency}")
 end
 
-{:ok, %{transactions: txns}} = Tokenio.AIS.list_transactions(client, account.id, limit: 20)
+{:ok, %{transactions: txns}} = TokenioClient.AIS.list_transactions(client, account.id, limit: 20)
 ```
 
 ---
@@ -131,7 +131,7 @@ end
 
 ```elixir
 # Register your endpoint
-:ok = Tokenio.Webhooks.set_config(client, "https://yourapp.com/webhooks/tokenio",
+:ok = TokenioClient.Webhooks.set_config(client, "https://yourapp.com/webhooks/tokenio_client",
   events: ["payment.completed", "vrp.completed", "refund.completed"]
 )
 
@@ -141,14 +141,14 @@ def handle_webhook(conn) do
   sig = Plug.Conn.get_req_header(conn, "x-token-signature") |> List.first()
   secret = System.fetch_env!("TOKENIO_WEBHOOK_SECRET")
 
-  case Tokenio.Webhooks.parse(body, sig, webhook_secret: secret) do
+  case TokenioClient.Webhooks.parse(body, sig, webhook_secret: secret) do
     {:ok, %{type: "payment.completed"} = event} ->
-      data = Tokenio.Webhooks.decode_payment_data(event)
+      data = TokenioClient.Webhooks.decode_payment_data(event)
       handle_payment_completed(data.payment_id, data.status)
       send_resp(conn, 200, "ok")
 
     {:ok, %{type: "vrp.completed"} = event} ->
-      data = Tokenio.Webhooks.decode_vrp_data(event)
+      data = TokenioClient.Webhooks.decode_vrp_data(event)
       handle_vrp_completed(data.vrp_id)
       send_resp(conn, 200, "ok")
 
@@ -165,21 +165,21 @@ end
 
 ## Error Handling
 
-All API functions return `{:ok, result}` or `{:error, %Tokenio.Error{}}`.
+All API functions return `{:ok, result}` or `{:error, %TokenioClient.Error{}}`.
 
 ```elixir
-case Tokenio.Payments.get(client, payment_id) do
+case TokenioClient.Payments.get(client, payment_id) do
   {:ok, payment} ->
     payment
 
-  {:error, %Tokenio.Error{code: :not_found}} ->
+  {:error, %TokenioClient.Error{code: :not_found}} ->
     nil
 
-  {:error, %Tokenio.Error{code: :rate_limit_exceeded, retry_after: ra}} ->
+  {:error, %TokenioClient.Error{code: :rate_limit_exceeded, retry_after: ra}} ->
     Process.sleep((ra || 5) * 1_000)
-    Tokenio.Payments.get(client, payment_id)
+    TokenioClient.Payments.get(client, payment_id)
 
-  {:error, %Tokenio.Error{} = err} ->
+  {:error, %TokenioClient.Error{} = err} ->
     Logger.error("Token.io error: #{Exception.message(err)}")
     {:error, err}
 end
@@ -188,7 +188,7 @@ end
 ### Error predicates
 
 ```elixir
-alias Tokenio.Error
+alias TokenioClient.Error
 
 Error.not_found?(err)       # true for 404
 Error.unauthorized?(err)    # true for 401
@@ -201,7 +201,7 @@ Error.retryable?(err)       # true for 429, 500, 502, 503, 504
 ## Configuration
 
 ```elixir
-{:ok, client} = Tokenio.new(
+{:ok, client} = TokenioClient.new(
   client_id: "...",
   client_secret: "...",
   environment: :production,        # :sandbox | :production (default: :sandbox)
@@ -212,17 +212,17 @@ Error.retryable?(err)       # true for 429, 500, 502, 503, 504
 )
 
 # Static token (bypass OAuth2 — useful for testing)
-{:ok, client} = Tokenio.new(static_token: "Bearer xyz")
+{:ok, client} = TokenioClient.new(static_token: "Bearer xyz")
 
 # Custom base URL (for test mocks)
-{:ok, client} = Tokenio.new(static_token: "test", base_url: "http://localhost:4000")
+{:ok, client} = TokenioClient.new(static_token: "test", base_url: "http://localhost:4000")
 ```
 
 ### Application config (optional)
 
 ```elixir
 # config/runtime.exs
-config :tokenio,
+config :tokenio_client,
   pool_size: 20,
   pool_count: 2
 ```
@@ -234,26 +234,26 @@ config :tokenio,
 ```elixir
 # Attach in your application startup
 :telemetry.attach_many(
-  "tokenio-telemetry",
+  "tokenio_client-telemetry",
   [
-    [:tokenio, :request, :start],
-    [:tokenio, :request, :stop],
-    [:tokenio, :request, :exception]
+    [:tokenio_client, :request, :start],
+    [:tokenio_client, :request, :stop],
+    [:tokenio_client, :request, :exception]
   ],
-  &MyApp.TokenioTelemetry.handle_event/4,
+  &MyApp.TokenioClientTelemetry.handle_event/4,
   nil
 )
 
-defmodule MyApp.TokenioTelemetry do
+defmodule MyApp.TokenioClientTelemetry do
   require Logger
 
-  def handle_event([:tokenio, :request, :stop], %{duration: d}, %{method: m, path: p, status: s}, _) do
-    Logger.info("[tokenio] #{m} #{p} → #{s} (#{d}ms)")
-    :telemetry.execute([:my_app, :tokenio, :request], %{duration: d}, %{status: s})
+  def handle_event([:tokenio_client, :request, :stop], %{duration: d}, %{method: m, path: p, status: s}, _) do
+    Logger.info("[tokenio_client] #{m} #{p} → #{s} (#{d}ms)")
+    :telemetry.execute([:my_app, :tokenio_client, :request], %{duration: d}, %{status: s})
   end
 
-  def handle_event([:tokenio, :request, :exception], %{duration: d}, %{method: m, path: p}, _) do
-    Logger.error("[tokenio] #{m} #{p} failed after #{d}ms")
+  def handle_event([:tokenio_client, :request, :exception], %{duration: d}, %{method: m, path: p}, _) do
+    Logger.error("[tokenio_client] #{m} #{p} failed after #{d}ms")
   end
 
   def handle_event(_, _, _, _), do: :ok
@@ -268,7 +268,7 @@ end
 # In your test, use a static token pointing at Bypass
 setup do
   bypass = Bypass.open()
-  {:ok, client} = Tokenio.new(static_token: "test", base_url: "http://localhost:#{bypass.port}")
+  {:ok, client} = TokenioClient.new(static_token: "test", base_url: "http://localhost:#{bypass.port}")
   {:ok, bypass: bypass, client: client}
 end
 
@@ -282,8 +282,8 @@ test "handles payment", %{bypass: bypass, client: client} do
     }))
   end)
 
-  assert {:ok, payment} = Tokenio.Payments.get(client, "pm:abc")
-  assert Tokenio.Payments.Payment.completed?(payment)
+  assert {:ok, payment} = TokenioClient.Payments.get(client, "pm:abc")
+  assert TokenioClient.Payments.Payment.completed?(payment)
 end
 ```
 

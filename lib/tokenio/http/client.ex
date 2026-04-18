@@ -1,4 +1,4 @@
-defmodule Tokenio.HTTP.Client do
+defmodule TokenioClient.HTTP.Client do
   @moduledoc """
   Internal HTTP client backed by Finch.
 
@@ -12,13 +12,13 @@ defmodule Tokenio.HTTP.Client do
 
   require Logger
 
-  alias Tokenio.Error
-  alias Tokenio.HTTP.TokenCache
+  alias TokenioClient.Error
+  alias TokenioClient.HTTP.TokenCache
 
   @sandbox_url "https://api.sandbox.token.io"
   @production_url "https://api.token.io"
   @sdk_version "1.0.0"
-  @user_agent "tokenio-elixir/#{@sdk_version}"
+  @user_agent "tokenio_client-elixir/#{@sdk_version}"
 
   @type auth :: {:oauth2, String.t(), String.t()} | {:static, String.t()}
 
@@ -39,7 +39,7 @@ defmodule Tokenio.HTTP.Client do
     max_retries: 3,
     retry_wait_min: 500,
     retry_wait_max: 5_000,
-    finch_name: Tokenio.Finch
+    finch_name: TokenioClient.Finch
   ]
 
   # ---------------------------------------------------------------------------
@@ -70,7 +70,7 @@ defmodule Tokenio.HTTP.Client do
       max_retries: Keyword.get(opts, :max_retries, 3),
       retry_wait_min: Keyword.get(opts, :retry_wait_min, 500),
       retry_wait_max: Keyword.get(opts, :retry_wait_max, 5_000),
-      finch_name: Keyword.get(opts, :finch_name, Tokenio.Finch)
+      finch_name: Keyword.get(opts, :finch_name, TokenioClient.Finch)
     }
   end
 
@@ -133,7 +133,7 @@ defmodule Tokenio.HTTP.Client do
         wait_ms = jitter_backoff(attempt, client.retry_wait_min, client.retry_wait_max)
 
         Logger.warning(
-          "[Tokenio] Retrying #{method_label(method)} #{path} " <>
+          "[TokenioClient] Retrying #{method_label(method)} #{path} " <>
             "(attempt #{attempt + 1}/#{client.max_retries}, wait #{wait_ms}ms) — #{err.code}"
         )
 
@@ -162,20 +162,20 @@ defmodule Tokenio.HTTP.Client do
     meta = %{method: method, path: path}
 
     start = System.monotonic_time(:millisecond)
-    :telemetry.execute([:tokenio, :request, :start], %{system_time: System.system_time()}, meta)
+    :telemetry.execute([:tokenio_client, :request, :start], %{system_time: System.system_time()}, meta)
 
     case Finch.request(req, client.finch_name, receive_timeout: client.timeout) do
       {:ok, %Finch.Response{status: status, headers: resp_headers, body: resp_body}} ->
         elapsed = System.monotonic_time(:millisecond) - start
         stop_meta = Map.put(meta, :status, status)
-        :telemetry.execute([:tokenio, :request, :stop], %{duration: elapsed}, stop_meta)
-        Logger.debug("[Tokenio] #{method_label(method)} #{path} → #{status} (#{elapsed}ms)")
+        :telemetry.execute([:tokenio_client, :request, :stop], %{duration: elapsed}, stop_meta)
+        Logger.debug("[TokenioClient] #{method_label(method)} #{path} → #{status} (#{elapsed}ms)")
         parse_response(status, resp_headers, resp_body)
 
       {:error, reason} ->
         elapsed = System.monotonic_time(:millisecond) - start
-        :telemetry.execute([:tokenio, :request, :exception], %{duration: elapsed}, meta)
-        Logger.error("[Tokenio] #{method_label(method)} #{path} failed — #{inspect(reason)}")
+        :telemetry.execute([:tokenio_client, :request, :exception], %{duration: elapsed}, meta)
+        Logger.error("[TokenioClient] #{method_label(method)} #{path} failed — #{inspect(reason)}")
         {:error, Error.network_error(reason)}
     end
   end
@@ -256,7 +256,7 @@ defmodule Tokenio.HTTP.Client do
 
     req = Finch.build(:post, url, headers, body)
 
-    case Finch.request(req, Tokenio.Finch, receive_timeout: 10_000) do
+    case Finch.request(req, TokenioClient.Finch, receive_timeout: 10_000) do
       {:ok, %Finch.Response{status: 200, body: resp_body}} ->
         case Jason.decode(resp_body) do
           {:ok, %{"access_token" => tok, "expires_in" => ttl}}

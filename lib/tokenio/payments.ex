@@ -1,4 +1,4 @@
-defmodule Tokenio.Payments do
+defmodule TokenioClient.Payments do
   @moduledoc """
   Token.io Payments v2 API.
 
@@ -27,7 +27,7 @@ defmodule Tokenio.Payments do
 
   ## Example
 
-      {:ok, payment} = Tokenio.Payments.initiate(client, %{
+      {:ok, payment} = TokenioClient.Payments.initiate(client, %{
         bank_id: "ob-modelo",
         amount: %{value: "10.50", currency: "GBP"},
         creditor: %{account_number: "12345678", sort_code: "040004", name: "Acme Ltd"},
@@ -36,16 +36,16 @@ defmodule Tokenio.Payments do
         return_refund_account: true
       })
 
-      if Tokenio.Payments.Payment.requires_redirect?(payment) do
+      if TokenioClient.Payments.Payment.requires_redirect?(payment) do
         {:redirect, payment.redirect_url}
       end
   """
 
-  alias Tokenio.Client
-  alias Tokenio.Error
-  alias Tokenio.HTTP.Client, as: HTTP
-  alias Tokenio.Payments.Payment
-  alias Tokenio.Types
+  alias TokenioClient.Client
+  alias TokenioClient.Error
+  alias TokenioClient.HTTP.Client, as: HTTP
+  alias TokenioClient.Payments.Payment
+  alias TokenioClient.Types
 
   @base "/v2/payments"
 
@@ -184,7 +184,7 @@ defmodule Tokenio.Payments do
 
   Called when payment status is `INITIATION_PENDING_EMBEDDED_AUTH`.
 
-      {:ok, updated} = Tokenio.Payments.provide_embedded_auth(client, payment_id, %{
+      {:ok, updated} = TokenioClient.Payments.provide_embedded_auth(client, payment_id, %{
         "otp_field_id" => "123456"
       })
   """

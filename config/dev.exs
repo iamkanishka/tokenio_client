@@ -1,4 +1,4 @@
 import Config
 
 # Dev-specific overrides
-# config :tokenio, pool_size: 5
+# config :tokenio_client, pool_size: 5

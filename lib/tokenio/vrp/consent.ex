@@ -1,4 +1,4 @@
-defmodule Tokenio.VRP.Consent do
+defmodule TokenioClient.VRP.Consent do
   @moduledoc """
   A Token.io VRP consent resource.
 
@@ -7,12 +7,12 @@ defmodule Tokenio.VRP.Consent do
 
   ## Status predicates
 
-      Tokenio.VRP.Consent.final?(consent)
-      Tokenio.VRP.Consent.authorized?(consent)
-      Tokenio.VRP.Consent.requires_redirect?(consent)
+      TokenioClient.VRP.Consent.final?(consent)
+      TokenioClient.VRP.Consent.authorized?(consent)
+      TokenioClient.VRP.Consent.requires_redirect?(consent)
   """
 
-  alias Tokenio.Types
+  alias TokenioClient.Types
 
   @terminal ~w[AUTHORIZED REJECTED REVOKED FAILED]
   @redirect ~w[PENDING_REDIRECT_AUTH PENDING_REDIRECT_AUTH_VERIFICATION]

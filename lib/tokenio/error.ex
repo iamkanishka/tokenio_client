@@ -1,4 +1,4 @@
-defmodule Tokenio.Error do
+defmodule TokenioClient.Error do
   @moduledoc """
   Typed error returned by all Token.io API functions.
 
@@ -20,10 +20,10 @@ defmodule Tokenio.Error do
 
   ## Pattern matching
 
-      case Tokenio.Payments.get(client, id) do
+      case TokenioClient.Payments.get(client, id) do
         {:ok, payment} -> payment
-        {:error, %Tokenio.Error{code: :not_found}} -> nil
-        {:error, %Tokenio.Error{code: :rate_limit_exceeded, retry_after: ra}} ->
+        {:error, %TokenioClient.Error{code: :not_found}} -> nil
+        {:error, %TokenioClient.Error{code: :rate_limit_exceeded, retry_after: ra}} ->
           Process.sleep((ra || 5) * 1_000)
         {:error, err} -> raise err
       end

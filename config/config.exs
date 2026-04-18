@@ -1,6 +1,6 @@
 import Config
 
-config :tokenio,
+config :tokenio_client,
   sandbox_base_url: "https://api.sandbox.token.io",
   production_base_url: "https://api.token.io",
   pool_size: 10,
