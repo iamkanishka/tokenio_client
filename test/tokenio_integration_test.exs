@@ -94,7 +94,8 @@ defmodule TokenioClient.IntegrationTest do
     end
 
     test "returns validation error for empty payment_id", %{client: client} do
-      assert {:error, %TokenioClient.Error{code: :unknown}} = TokenioClient.Payments.get(client, "")
+      assert {:error, %TokenioClient.Error{code: :unknown}} =
+               TokenioClient.Payments.get(client, "")
     end
   end
 

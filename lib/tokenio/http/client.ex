@@ -162,7 +162,12 @@ defmodule TokenioClient.HTTP.Client do
     meta = %{method: method, path: path}
 
     start = System.monotonic_time(:millisecond)
-    :telemetry.execute([:tokenio_client, :request, :start], %{system_time: System.system_time()}, meta)
+
+    :telemetry.execute(
+      [:tokenio_client, :request, :start],
+      %{system_time: System.system_time()},
+      meta
+    )
 
     case Finch.request(req, client.finch_name, receive_timeout: client.timeout) do
       {:ok, %Finch.Response{status: status, headers: resp_headers, body: resp_body}} ->
@@ -175,7 +180,11 @@ defmodule TokenioClient.HTTP.Client do
       {:error, reason} ->
         elapsed = System.monotonic_time(:millisecond) - start
         :telemetry.execute([:tokenio_client, :request, :exception], %{duration: elapsed}, meta)
-        Logger.error("[TokenioClient] #{method_label(method)} #{path} failed — #{inspect(reason)}")
+
+        Logger.error(
+          "[TokenioClient] #{method_label(method)} #{path} failed — #{inspect(reason)}"
+        )
+
         {:error, Error.network_error(reason)}
     end
   end

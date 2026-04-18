@@ -23,7 +23,9 @@ defmodule TokenioClientTest do
     end
 
     test "custom base_url overrides environment" do
-      assert {:ok, client} = TokenioClient.new(static_token: "tok", base_url: "http://localhost:4000")
+      assert {:ok, client} =
+               TokenioClient.new(static_token: "tok", base_url: "http://localhost:4000")
+
       assert client.http.base_url == "http://localhost:4000"
     end
 
@@ -36,7 +38,9 @@ defmodule TokenioClientTest do
     end
 
     test "applies custom timeout and max_retries" do
-      assert {:ok, client} = TokenioClient.new(static_token: "tok", timeout: 60_000, max_retries: 5)
+      assert {:ok, client} =
+               TokenioClient.new(static_token: "tok", timeout: 60_000, max_retries: 5)
+
       assert client.http.timeout == 60_000
       assert client.http.max_retries == 5
     end

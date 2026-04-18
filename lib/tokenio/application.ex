@@ -17,7 +17,9 @@ defmodule TokenioClient.Application do
 
   @spec finch_pools() :: map()
   defp finch_pools do
-    sandbox = Application.get_env(:tokenio_client, :sandbox_base_url, "https://api.sandbox.token.io")
+    sandbox =
+      Application.get_env(:tokenio_client, :sandbox_base_url, "https://api.sandbox.token.io")
+
     prod = Application.get_env(:tokenio_client, :production_base_url, "https://api.token.io")
     size = Application.get_env(:tokenio_client, :pool_size, 10)
     count = Application.get_env(:tokenio_client, :pool_count, 1)
