@@ -237,7 +237,16 @@ defmodule TokenioClient.Webhooks do
   end
 
   @spec decode_event(binary()) ::
-          {:ok, %{optional(atom()) => term()}} | {:error, :json_decode_error}
+  {:ok,
+   %{
+     id: term(),
+     type: term(),
+     api_version: term(),
+     created_at: DateTime.t() | nil,
+     data: term(),
+     raw: map()
+   }}
+  | {:error, :json_decode_error}
   defp decode_event(payload) do
     case Jason.decode(payload) do
       {:ok, m} when is_map(m) ->
